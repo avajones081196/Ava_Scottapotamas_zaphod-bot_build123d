@@ -1,0 +1,7 @@
+============================================================
+CHECKPOINT SUMMARY  :  zaphod_bot_mec_fbcoup_3mm_globe_summary_G_1_4.txt
+Time                :  2026-05-26 17:30:03
+Guideline reached   :  G4  (G4 revolve of profile about axis (360°) — 5 face(s))
+Pieces in compound  :  5
+Cumulative area     :  40.988 mm²
+============================================================

@@ -1,0 +1,20 @@
+============================================================
+0_preprocess_csvs.py  Execution Log
+Time        : 2026-05-26 16:48:04
+Base folder : /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_fbcoup_3mm_globe
+Input  dir  : /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_fbcoup_3mm_globe/csv_data_zaphod_bot_mec_fbcoup_3mm_globe
+Output dir  : /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_fbcoup_3mm_globe/csv_merged
+============================================================
+
+Found 2 CSV file(s) in input folder.
+
+WROTE    S1: Fusion_Coordinates_S1.csv → Fusion_Coordinates_S1.csv
+WROTE    S2: Fusion_Coordinates_S2.csv → Fusion_Coordinates_S2.csv
+
+============================================================
+SUMMARY
+============================================================
+  Shapes skipped (already merged) : 0
+  New shapes written              : 2
+  Duplicate rows removed (total)  : 0
+============================================================
