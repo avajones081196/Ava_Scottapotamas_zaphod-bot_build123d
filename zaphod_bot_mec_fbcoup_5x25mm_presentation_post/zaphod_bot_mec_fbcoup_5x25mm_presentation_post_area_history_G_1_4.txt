@@ -1,0 +1,11 @@
+============================================================
+AREA HISTORY  :  zaphod_bot_mec_fbcoup_5x25mm_presentation_post_area_history_G_1_4.txt
+Time          :  2026-05-27 12:53:18
+============================================================
+
+ Guideline   Cumulative area (mm²)     Δ from prev (mm²)  Label
+------------------------------------------------------------------------------------------
+  G1                          0.000                +0.000  G1 S1 closed profile wire (12 edges) on Z=4.581999999999999
+  G2                          0.000                +0.000  G2 S2 construction axis line
+  G4                        773.575              +773.575  G4 revolve of profile about axis (360°) — 12 face(s)
+============================================================
