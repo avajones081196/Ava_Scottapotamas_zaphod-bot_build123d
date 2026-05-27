@@ -1,0 +1,154 @@
+
+██████████████████████████████████████████████████████████████████████
+  SURFACE COMPARISON: Build123d vs Reference STL
+  Run time   : 2026-05-27 11:22:25
+  Platform   : darwin (Python 3.11.15)
+  Project    : /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post
+  Folder     : zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post
+██████████████████████████████████████████████████████████████████████
+  Build123d  : zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post_G_1_4.stl
+  Reference  : zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post_reference.stl
+  Report     : zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post_build123d_vs_reference_G_1_4.txt
+
+  ======================================================================
+  Build123d STL
+
+  ======================================================================
+  File              : zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post_G_1_4.stl
+  Triangles         : 51,873
+  Vertices          : 26,016
+  Watertight        : False  (open surface)
+  Surface area      : 414.1139 mm^2
+  Bbox X            :     0.3466 -> 7.3474 mm (span 7.0009)
+  Bbox Y            :    -0.0000 -> 21.9160 mm (span 21.9160)
+  Bbox Z            :     0.5093 -> 7.5090 mm (span 6.9997)
+  Centroid          : (3.8470, 8.1040, 4.0080) mm
+
+  ======================================================================
+  Reference STL
+
+  ======================================================================
+  File              : zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post_reference.stl
+  Triangles         : 7,810
+  Vertices          : 3,907
+  Watertight        : True  (closed solid)
+  Surface area      : 413.4903 mm^2
+  Bbox X            :     0.3478 -> 7.3424 mm (span 6.9946)
+  Bbox Y            :     0.0000 -> 21.9165 mm (span 21.9165)
+  Bbox Z            :     0.5126 -> 7.5088 mm (span 6.9963)
+  Centroid          : (3.8475, 8.1018, 4.0088) mm
+
+  ======================================================================
+  SURFACE AREA COMPARISON
+
+  ======================================================================
+  Metric                                       Value  Unit
+  -----------------------------------------------------------------
+  Build123d surface area                    414.1139  mm^2
+  Reference surface area                    413.4903  mm^2
+  Absolute difference                        +0.6235  mm^2  (build123d larger)
+  % error vs reference                        0.1508  %
+  Rating                                 🟢 EXCELLENT
+
+  ======================================================================
+  TESSELLATION DENSITY  (informational - different tessellators
+                         can produce different triangle counts
+                         for the same underlying surface)
+
+  ======================================================================
+  Metric                                  Build123d     Reference     Delta
+  -----------------------------------------------------------------
+  Triangles                                  51,873         7,810   +44,063
+  Vertices                                   26,016         3,907   +22,109
+  Unique edges                               77,889        11,715   +66,174
+  Avg edge length (mm)                       0.1301        0.5501   -0.4200
+
+  Note: small differences in triangle / edge counts are expected.
+        What matters is that the SURFACES match, not the meshes.
+
+  ======================================================================
+  BOUNDING BOX COMPARISON  (tolerance +/-0.1 mm per axis)
+
+  ======================================================================
+  Axis         Build123d     Reference    D (mm)    % err  Status
+  -----------------------------------------------------------------
+  X min           0.3466        0.3478   -0.0012   0.017%  ✅
+  X max           7.3474        7.3424   +0.0050   0.072%  ✅
+  Y min          -0.0000        0.0000   -0.0000   0.000%  ✅
+  Y max          21.9160       21.9165   -0.0005   0.002%  ✅
+  Z min           0.5093        0.5126   -0.0033   0.047%  ✅
+  Z max           7.5090        7.5088   +0.0002   0.003%  ✅
+
+  Overall bounding box : ✅ PASS
+
+  ======================================================================
+  CENTROID ALIGNMENT  (tolerance +/-0.1 mm per axis)
+
+  ======================================================================
+  Axis         Build123d     Reference    D (mm)  Status
+  -----------------------------------------------------------------
+  X               3.8470        3.8475   -0.0005  ✅
+  Y               8.1040        8.1018   +0.0022  ✅
+  Z               4.0080        4.0088   -0.0008  ✅
+
+  Centroid distance : 0.0024 mm
+  Overall centroid  : ✅ PASS
+
+  ======================================================================
+  HAUSDORFF / NEAREST-POINT DISTANCE  (n_samples = 50,000)
+  THE primary metric for surface-vs-surface equivalence:
+  measures how far each surface deviates from the other.
+
+  ======================================================================
+  Metric                                      Value (mm)  Rating
+  -----------------------------------------------------------------
+  Hausdorff (max)                               0.009754  🟢 EXCELLENT
+  Mean distance                                 0.003158  🟢 EXCELLENT
+  RMS distance                                  0.003899
+  95th percentile                               0.007159
+  99th percentile                               0.008175
+
+  Interpretation:
+   - Mean distance much less than 1 mesh-edge length means
+     surfaces are coincident in the bulk, with only mesh noise.
+   - Hausdorff much larger than mean -> a small region where
+     the surfaces diverge significantly (a missing or misplaced
+     feature), even though most of the area aligns.
+
+  ======================================================================
+  CROSS-SECTION SLICE COMPARISON  (7 cuts at Y planes)
+  Y planes (auto-derived from mesh bounds): [1.096, 4.383, 7.671, 10.958, 14.245, 17.533, 20.82]
+  Cuts both meshes at each Y plane and compares the outline.
+
+  ======================================================================
+         Y    B123d len      Ref len       D len       D %  Status
+  -----------------------------------------------------------------
+     1.096      23.0577      23.0432     +0.0145    0.063%  ✅
+     4.383      23.3891      23.3683     +0.0208    0.089%  ✅
+     7.671      25.4811      25.4517     +0.0294    0.115%  ✅
+    10.958      21.0149      20.9745     +0.0404    0.193%  ✅
+    14.245      13.4479      13.4137     +0.0341    0.254%  ✅
+    17.533       5.7208       5.7046     +0.0161    0.283%  ✅
+    20.820       6.2427       6.2416     +0.0011    0.018%  ✅
+
+  Overall section comparison: ✅ PASS
+
+  ██████████████████████████████████████████████████████████████████████
+  SUMMARY SCORECARD
+
+  ██████████████████████████████████████████████████████████████████████
+  Check                                             Score  Rating
+  -----------------------------------------------------------------
+  Surface area % error                             0.151%  🟢 EXCELLENT
+  Bounding box                                     ✅ PASS
+  Centroid alignment                               ✅ PASS  (dist: 0.0024 mm)
+  Hausdorff distance (mm)                        0.009754  🟢 EXCELLENT
+  Mean distance (mm)                             0.003158  🟢 EXCELLENT
+  Cross-section slices                             ✅ PASS
+
+  ██████████████████████████████████████████████████████████████████████
+
+  OVERALL VERDICT : 🟢 SURFACES MATCH
+
+  Report saved -> /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post/zaphod_bot_mec_fbcoup_5x15mm_2mm_globe_post_build123d_vs_reference_G_1_4.txt
+
