@@ -1,0 +1,227 @@
+# Ava — Scottapotamas zaphod-bot build123d Reconstruction
+
+Reconstruction of the [zaphod-bot project](https://github.com/Scottapotamas/zaphod-bot) STL parts in [build123d](https://github.com/gumyr/build123d), with surface-area / Hausdorff-distance verification against the original GitHub-hosted STLs.
+
+**Reference:** https://github.com/Scottapotamas/zaphod-bot
+**This repo:** https://github.com/avajones081196/Ava_Scottapotamas_zaphod-bot_build123d
+
+---
+
+## Project Overview
+
+The zaphod-bot project hosts 21 STL parts (mechanical sub-assemblies, fibre couplers, brackets, etc.). For each part this repo provides:
+
+1. A `<part_name>/` folder containing all working files
+2. A build123d Python script that parametrically reconstructs the part
+3. A surface-comparison script that validates the reconstruction against the reference STL
+4. A summary report and area-history log per stage
+
+Each part is rebuilt **from scratch in build123d** — not converted from the STL — so the result is a clean parametric model that matches the original geometry as closely as the source data allows.
+
+A future `zaphod_bot_assembly/` folder at the project root will combine all 21 finished part STLs into a single `zaphod_bot_assembly_Final.stl` for full-project visualization, following the same pattern used in the [PICSY companion repo](https://github.com/avajones081196/Ava_Jana-Marie_PICSY_build123d).
+
+---
+
+## Status
+
+| # | Part | Status | Surface area err | Mean dist (mm) | Hausdorff (mm) | Time |
+|---|------|--------|------------------|----------------|----------------|------|
+| 1 | zaphod_bot_mec_fbcoup_3mm_globe | ✅ Complete | 0.18% | 0.0019 | 0.0051 | 1 h |
+| 2 | — | ⏳ Pending | | | | |
+| 3 | — | ⏳ Pending | | | | |
+| ... | | | | | | |
+| 21 | — | ⏳ Pending | | | | |
+
+`zaphod_bot_mec_fbcoup_3mm_globe` is the first part. It is a 3 mm globe surface of revolution built from two source sketches (S1 profile + S2 axis). All five aggregate metrics land in the 🟢 EXCELLENT band: surface area to 0.18%, mean point distance 0.0019 mm, Hausdorff worst-case 0.0051 mm, bounding box ≤ 0.004 mm/axis, centroid distance 0.0009 mm. See "Notes on zaphod_bot_mec_fbcoup_3mm_globe" below for the build detail behind it.
+
+---
+
+## Methodology
+
+The reconstruction pipeline is the same for every part. For surface parts (open shells like `zaphod_bot_mec_fbcoup_3mm_globe`) and solid parts (closed bodies) the comparison metrics differ; everything else is identical.
+
+### Step 1 — Coordinate extraction in Fusion 360
+
+The reference STL is imported into Fusion 360. Using a custom Fusion add-in script (not included in this repo), each closed sketch profile is selected, and its line / arc / spline endpoints are written to a CSV with this schema:
+
+```
+Steps, Draw Type, X1, Y1, Z1, X2, Y2, Z2, X3, Y3, Z3, …
+```
+
+`Draw Type` is one of `Line`, `3_point_arc`, `3_point_circle`, `spline_<N>_points`, `Point`, etc. The X/Y/Z columns hold world-space coordinates in millimetres. Splines extend the row with additional `X_n / Y_n / Z_n` columns for each control point. Each logical sketch is one CSV file (`Fusion_Coordinates_S1.csv`, `Fusion_Coordinates_S2.csv`, …). Splitting by sketch makes loop detection deterministic — adjacent profiles that touch at a corner are kept in separate files so the loop-walker doesn't merge them.
+
+### Step 2 — CSV cleaning (`0_preprocess_csvs.py`)
+
+A preprocessor consolidates and validates the raw CSVs:
+- Strips trailing whitespace
+- Removes duplicate rows
+- Validates each row has the right number of fields
+- Writes cleaned outputs to `csv_merged/`
+
+### Step 3 — build123d reconstruction (`<part>_build123d.py`)
+
+The main script reads the cleaned CSVs and rebuilds the geometry as a series of numbered guidelines (G1, G2, G3, …). The guideline count scales with part complexity — for the 3mm_globe G1–G4 is enough (G3 is always the final export step). For larger parts the count will grow into the dozens, following the same pattern proven on the PICSY companion repo (where individual parts run up to G92). The pattern is:
+
+- **Read CSV** guidelines — parse line / arc / spline / point segments, walk endpoints to detect closed loops or open chains.
+- **Build profile wires** — assemble parsed primitives into oriented `Wire` objects. Profiles can be left as construction-only (no patched face) when the next step is a sweep / revolve / loft that consumes the wire directly.
+- **Surface-revolve / extrude / loft** — the part-specific geometric operation. For `3mm_globe` this is a 360° revolve of an open profile wire about a construction-axis line. For future parts it may include any of the extrude / loft / boolean / trim patterns documented in the PICSY companion repo.
+- **G3** — always last: apply `.clean()` to remove micro-scars, then export STL + STEP.
+
+Key implementation notes:
+
+- **Cross-platform paths.** `BASE_DIR = Path(__file__).resolve().parent`. No hardcoded absolute paths anywhere.
+- **World-coordinate face construction.** All `Edge.make_line(Vector(x, y, z), …)` calls use world coordinates directly. `Plane.XZ.offset()` is avoided because it silently flipped the Z axis in some build123d versions.
+- **Plane-detection per CSV (axis-aligned + tilted).** Each CSV sketch's plane is auto-detected per the template's coordinate convention. The detector first tries the axis-aligned case (one of X / Y / Z is constant within tolerance); if no axis is constant, it falls back to a least-squares plane fit via SVD (centroid + smallest-singular-direction normal). For `3mm_globe` both S1 and S2 auto-detect to X = 15.0. The detector returns `('axis', letter, value)` or `('general', origin, normal)` and downstream geometry-builders dispatch on that tuple.
+- **Open-chain walking for surfaces of revolution.** When a profile is meant to be revolved (rather than patched into a face), the source CSV gives an *open* chain whose two free endpoints sit on the revolve axis — the on-axis gap is closed by the revolution itself, no explicit edge needed. A small walker traverses the parsed primitives by endpoint adjacency: find the two count-1 endpoints (the chain's free ends), pick one as start, then at each step pick the unused primitive that shares the current "front" endpoint, reversing it if necessary, and continue until the other free end is reached. Used for `3mm_globe` G1 (5 edges: 2 Lines + 3 three-point arcs). The same walker generalises to mixed line / arc / spline chains.
+- **Three-point arc handling.** The Fusion add-in exports each arc as `(p1, p2, p3) = (start, middle-on-arc, end)`. The build script calls `Edge.make_three_point_arc(start, mid, end)` directly; the `parse_three_point_arcs` helper keeps the middle point as part of the (start, mid, end) tuple so it survives any reversal during chain walking.
+- **Axis-snap for noisy construction lines.** Fusion's add-in sometimes exports a "constant-along-one-axis" construction line with a small wobble in that axis (the `3mm_globe` S2 axis has a 0.018 mm Y-wobble). The build script detects when a component varies by less than `AXIS_SNAP_MM = 0.05 mm` and snaps that component to its mean, so the revolve axis is perfectly axis-aligned and the resulting surface of revolution has no tilt. Without this snap the 0.018 mm Y-drift would translate proportionally through the revolve.
+- **`build123d.revolve()` quietly fails on open wires.** Given an open `Wire`, build123d's high-level `revolve()` returns an empty `Compound` without raising. The script goes directly to OCCT's `BRepPrimAPI.BRepPrimAPI_MakeRevol(wire, gp_Ax1, angle, copy=True)` as the primary path, with per-edge revolve as a fallback and build123d's `revolve()` as a last-resort fallback. The primary path produces one face per profile primitive (5 faces for the 3mm_globe).
+- **Post-revolve scale fix for CSV-vs-reference unit mismatch.** The Fusion add-in's CSV export for `3mm_globe` came out at 10× the reference part's scale (CSV span ~30 mm vs reference span ~3 mm). The fastest fix is a single post-revolve scale step in G4: build the surface at the CSV's native scale, then apply `gp_Trsf.SetScale(origin, 0.1)` via `BRepBuilderAPI_Transform` to every face. A cleaner long-term fix would live in `0_preprocess_csvs.py`; the post-revolve scale is recorded here in case other parts hit the same export idiosyncrasy.
+- **Filename guideline-range convention.** Output filenames carry the active guideline range (e.g. `zaphod_bot_mec_fbcoup_3mm_globe_G_1_4.stl`) so multiple checkpoint exports coexist without clobbering each other.
+- **Per-guideline checkpoints.** Three top-of-file flags (`VIEW_AT`, `STOP_AFTER_VIEW`, `EXPORT_AT_CHECKPOINT`) let you halt at any guideline, send the cumulative state to the OCP viewer on port 3939, and optionally export `<part>_G_1_N.{stl,step,txt}` mid-pipeline for inspection.
+- **Surface-area tracking.** Every guideline's cumulative surface area is recorded. Both the main summary and a standalone `<part>_area_history_G_1_N.txt` document how area accumulates and (for trim guidelines, when they arrive in later parts) decreases. For complex parts this audit trail is the single most valuable debugging tool — any unexpected Δ-area at a downstream guideline points straight back to the upstream guideline that introduced the wrong geometry.
+
+### A note on `zaphod_bot_mec_fbcoup_3mm_globe` — why it took 1 hour
+
+The 3mm_globe is structurally the simplest possible PICSY-style part: a single open profile revolved about a single axis line, 4 guidelines total (G1, G2, G4, with G3 as the final export step). The 1 hour was split roughly as:
+
+- **~20 min** on the parser side: writing `parse_three_point_arcs`, the open-chain walker that finds the 2 free endpoints and walks the 5 primitives into a connected oriented chain, and confirming the plane auto-detector handles X-constant sketches the same way it handles Z-constant ones in the PICSY repo.
+- **~15 min** running into and fixing the empty-Compound silent failure from `build123d.revolve()` on an open Wire. The fix was straightforward once isolated — drop to OCCT's `BRepPrimAPI_MakeRevol` directly, which produces 5 faces (2 REVOLUTION, 1 TORUS, 1 CYLINDER, 1 CONE) of total area ~4099 mm² (pre-scale).
+- **~10 min** diagnosing the 10× scale mismatch when the first build came out as a 30 mm globe next to the 3 mm reference STL in Fusion. The CSV-vs-reference scale ratio was an exact 10×, so a single `gp_Trsf.SetScale(origin, 0.1)` step at the end of G4 closed the gap. Post-scale surface area: 40.988 mm² vs reference 40.9073 mm² — 0.18% off.
+- **~15 min** on the 0.018 mm Y-axis-wobble in the S2 construction line, the cross-platform `BASE_DIR` plumbing, and confirming the comparison script lands every metric in 🟢 EXCELLENT.
+
+Two notes worth recording for future parts:
+
+- **`build123d.revolve()` on open wires silently returns an empty Compound.** No exception, no warning — just zero faces in the result. Always check `len(result.faces())` before assuming success, or skip the wrapper and call `BRepPrimAPI_MakeRevol` directly when the profile is a 1-D wire rather than a closed face. The same defensive check pattern will apply to any other high-level build123d operation whose OCCT backend can degenerate on edge-case inputs.
+- **CSV-vs-reference unit mismatch is silent and uniform.** It does not announce itself as a single bad coordinate — every coordinate is wrong by the same factor, so plane detection still works, loop walking still works, the revolve still completes, and the only symptom is a build that's 10× too big when imported into Fusion next to the reference. Detection method: import both into Fusion and visually compare. Quick fix: post-build scale. Longer fix: catch it at the preprocess stage and emit a scale factor with the cleaned CSV.
+
+### Step 4 — Surface comparison (`<part>_compare_surfaces.py`)
+
+For **surface parts**, the volume + symmetric-volume-difference approach used for solids does not apply. Instead the comparison script reports six complementary metrics:
+
+| Metric | What it catches |
+|---|---|
+| Surface area %     | Wrong size, missing/extra faces |
+| Bounding box       | Scale or placement errors |
+| Tessellation density | Informational; different tessellators differ |
+| Centroid alignment | Translation drift |
+| **Hausdorff distance** | **THE primary metric — point-by-point worst-case deviation** |
+| Cross-section slices | Feature-level errors at specific Y depths |
+
+The Hausdorff section samples 50,000 random points on each surface, finds the nearest point on the other surface, and reports max / mean / RMS / 95th / 99th percentile distances. For surfaces these collectively prove "the two surfaces occupy the same locations in space," which is the surface analogue of "same volume + zero symmetric difference."
+
+The **cross-section slice comparison** has proven especially valuable on complex parts: it cuts both meshes at multiple Y-plane positions (auto-derived from mesh bounds) and compares the outline perimeter at each cut. Aggregate metrics like Hausdorff or mean-distance can mask a 1–2% feature-level discrepancy because the affected region is small compared to the total surface — the slice test bypasses this by comparing geometry at specific cross-sections.
+
+For **solid parts** the original volume + symmetric-volume-difference comparison from the [Thor assembly project](https://github.com/avajones081196/Ava_AngelLM_Thor_Art1_build123d) is used.
+
+---
+
+## Per-part Folder Layout
+
+```
+zaphod_bot_mec_fbcoup_3mm_globe/
+├── zaphod_bot_mec_fbcoup_3mm_globe_build123d.py            # main reconstruction script
+├── zaphod_bot_mec_fbcoup_3mm_globe_compare_surfaces.py     # comparison vs reference
+├── 0_preprocess_csvs.py                                    # CSV cleaner
+├── 0_preprocess_csvs_summary.txt                           # preprocess log
+├── csv_data_zaphod_bot_mec_fbcoup_3mm_globe/               # raw extracted CSVs
+├── csv_merged/                                             # cleaned CSVs (input to build script)
+│   ├── Fusion_Coordinates_S1.csv
+│   └── Fusion_Coordinates_S2.csv
+├── zaphod_bot_mec_fbcoup_3mm_globe_reference.STL           # downloaded from upstream zaphod-bot repo
+├── zaphod_bot_mec_fbcoup_3mm_globe_G_1_4.stl               # build123d output (final)
+├── zaphod_bot_mec_fbcoup_3mm_globe_G_1_4.step              # parametric format
+├── zaphod_bot_mec_fbcoup_3mm_globe_summary_G_1_4.txt       # per-guideline summary
+├── zaphod_bot_mec_fbcoup_3mm_globe_area_history_G_1_4.txt  # cumulative area per guideline
+└── zaphod_bot_mec_fbcoup_3mm_globe_build123d_vs_reference_G_1_4.txt  # comparison report
+```
+
+The same layout will be used for every part. Output filenames carry the active guideline range (e.g. `zaphod_bot_mec_fbcoup_3mm_globe_G_1_4.stl`) so checkpoint exports do not clobber each other.
+
+---
+
+## Environment
+
+```
+build123d
+ocp_vscode
+trimesh
+numpy-stl
+manifold3d
+rtree            # required for Hausdorff distance computation
+```
+
+OCP viewer is reached via:
+
+```python
+from ocp_vscode import show, set_port
+set_port(3939)
+```
+
+Tested on macOS (Python 3.11). Scripts are written cross-platform; should run unchanged on Windows and Linux.
+
+---
+
+## Running the Scripts
+
+From inside any part folder:
+
+```bash
+# Build the part
+python <part_name>_build123d.py
+
+# Compare the build123d output to the reference STL
+python <part_name>_compare_surfaces.py
+```
+
+To inspect intermediate stages, edit the top of the build script:
+
+```python
+VIEW_AT              = 4     # show state after guideline 4
+STOP_AFTER_VIEW      = True  # halt after that checkpoint
+EXPORT_AT_CHECKPOINT = True  # also write G_1_4.stl/.step
+```
+
+Set `VIEW_AT = None` for a clean end-to-end run that only writes the final outputs.
+
+---
+
+## Acceptance Criteria — How the Ratings Are Set
+
+For surface parts (e.g. `zaphod_bot_mec_fbcoup_3mm_globe`), the rating thresholds are aligned with typical FDM 3D-printer manufacturing tolerances rather than CAD-tight micrometre tolerances, since the zaphod-bot parts are designed for FDM printing. A well-tuned consumer FDM printer (Prusa, Bambu, etc.) has roughly 0.1–0.5 mm positional accuracy, with industry rule-of-thumb specs of ±0.5 mm. Anything below that floor is below what the manufacturing process can resolve, so it counts as "indistinguishable from the original" in practice.
+
+| Metric | 🟢 Excellent | 🟡 Good | 🟠 Acceptable | 🔴 Poor |
+|---|---|---|---|---|
+| Surface area % | ≤ 0.5% | ≤ 2% | ≤ 5% | > 5% |
+| Bounding box | ≤ 0.1 mm/axis | — | — | > 0.1 mm |
+| Centroid | ≤ 0.1 mm/axis | — | — | > 0.1 mm |
+| Hausdorff | ≤ 0.1 mm | ≤ 0.5 mm | ≤ 1.0 mm | > 1.0 mm |
+| Mean distance | ≤ 0.01 mm | ≤ 0.05 mm | ≤ 0.1 mm | > 0.1 mm |
+| Cross-section slices | all pass (≤ 0.5% per slice) | one slice 0.5–2% | one slice 2–5% | multiple fail or > 5% |
+
+Rationale for the Hausdorff / mean-distance thresholds:
+
+- **🟢 Excellent (≤ 0.1 mm)** — Indistinguishable from the original CAD even on a precision (e.g. SLA / industrial) printer.
+- **🟡 Good (≤ 0.5 mm)** — Below typical FDM positional accuracy; deviations of this size are lost in print noise.
+- **🟠 Acceptable (≤ 1.0 mm)** — Within loose FDM tolerance; the printed part will function correctly but small features may be slightly off.
+- **🔴 Poor (> 1.0 mm)** — Print-visible defect; the deviation is larger than what the printer would have introduced anyway, so the reconstruction needs review.
+
+A part needs to pass **every aggregate metric** (surface area, bounding box, centroid, Hausdorff, mean distance) to earn the ✅ Complete badge. The cross-section slice test is treated as a confirmation test rather than a strict gate: if all aggregate metrics pass AND the Hausdorff worst-case is under the FDM print-tolerance floor of 0.5 mm, then an isolated 🟠 ACCEPTABLE slice (one slice in the 2–5% band) is treated as a known minor variance rather than a failure — because the deviation, however large in *perimeter percentage*, is by definition smaller than what the FDM process can resolve.
+
+A part is marked ⚠ Review required (rather than ✅ Complete) if any aggregate metric fails, if Hausdorff exceeds 0.5 mm, or if more than one cross-section slice fails — in any of those cases the deviation is print-visible.
+
+Surface-area % thresholds are kept tight since that metric is a unitless ratio and not bounded by print tolerance.
+
+These mirror reverse-engineering / metrology defaults adjusted for FDM manufacturing (vs. machined-tight CAD comparison, where ≤ 0.05 mm thresholds would apply). Per-part the user may adjust thresholds at the top of the comparison script.
+
+---
+
+## Notes on the Reference STLs
+
+The reference STLs come from upstream tessellation by the zaphod-bot repo's authors. Some are not perfectly closed meshes — `is_watertight` may report `False`. This is normal: STL exports often leave non-coincident edges across feature boundaries. For the comparison script this is fine because surface comparison does not require closure.
+
+---
+
+## License
+
+This repo follows the upstream [zaphod-bot repository's license](https://github.com/Scottapotamas/zaphod-bot). All build123d reconstruction code and comparison utilities are provided as-is for educational and reverse-engineering purposes.
