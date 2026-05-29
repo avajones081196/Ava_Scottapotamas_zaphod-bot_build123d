@@ -1,0 +1,14 @@
+============================================================
+AREA HISTORY  :  zaphod_bot_mec_de_man_out_printer_proto_bearing_link_3_area_history_G_1_7.txt
+Time          :  2026-05-29 15:17:22
+============================================================
+
+ Guideline   Cumulative area (mm²)     Δ from prev (mm²)  Label
+------------------------------------------------------------------------------------------------
+  G1                       1652.330             +1652.330  G1 S1 profile extruded 16.0 along -Z → solid (vol 3735.3 mm³)
+  G2                       1023.524              -628.806  G2 S2 profile extruded 23.0 along +Y then intersected with G1 (vol 1584.6 mm³)
+  G4                        987.912               -35.612  G4 two through bores cut (S3 r=5.53 along Z, S4 r=5.53 along Y) — vol 625.3 mm³
+  G5                        952.467               -35.446  G5 filleted 16 outer edge(s) at r=0.5 (vol 616.6 mm³)
+  G6                        936.832               -15.635  G6 chamfered 8 bore-mouth edge(s) at 0.2 mm (vol 613.8 mm³)
+  G7                        936.832                +0.000  G7 un-stitched solid → surface body of 40 face(s)
+============================================================
