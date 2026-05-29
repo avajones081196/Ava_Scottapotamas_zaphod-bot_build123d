@@ -1,0 +1,13 @@
+============================================================
+AREA HISTORY  :  zaphod_bot_mec_de_man_out_printer_proto_homing_block_area_history_G_1_6.txt
+Time          :  2026-05-29 11:18:07
+============================================================
+
+ Guideline   Cumulative area (mm²)     Δ from prev (mm²)  Label
+------------------------------------------------------------------------------------------
+  G1                        141.072              +141.072  G1 surface-extruded walls — 4 straight + 4 tapered face(s) on Y=0.0..2.0
+  G2                        499.174              +358.102  G2 cap patches at Y=0.0 and Y=2.0
+  G4                        584.618               +85.444  G4 cylindrical tube walls (full length 4.0) — 2 face(s) on Y=-1.0..3.0
+  G5                        548.307               -36.311  G5 trimmed cap holes inside 2 tube footprints
+  G6                        505.585               -42.722  G6 trimmed tube walls to Y=0.0..2.0 — 2 face(s)
+============================================================

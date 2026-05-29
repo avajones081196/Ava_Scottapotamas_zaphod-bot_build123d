@@ -1,0 +1,7 @@
+============================================================
+CHECKPOINT SUMMARY  :  zaphod_bot_mec_de_man_out_printer_proto_homing_block_summary_G_1_6.txt
+Time                :  2026-05-29 11:18:07
+Guideline reached   :  G6  (G6 trimmed tube walls to Y=0.0..2.0 — 2 face(s))
+Pieces in compound  :  12
+Cumulative area     :  505.585 mm²
+============================================================
