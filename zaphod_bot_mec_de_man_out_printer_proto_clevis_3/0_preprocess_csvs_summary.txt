@@ -1,0 +1,39 @@
+============================================================
+0_preprocess_csvs.py  Execution Log
+Time        : 2026-05-30 15:43:32
+Base folder : /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_de_man_out_printer_proto_clevis_3
+Input  dir  : /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_de_man_out_printer_proto_clevis_3/csv_data_zaphod_bot_mec_de_man_out_printer_proto_clevis_3
+Output dir  : /Users/avajones/Documents/ava_build123d/20260526_assign/zaphod_bot_mec_de_man_out_printer_proto_clevis_3/csv_merged
+============================================================
+
+Found 21 CSV file(s) in input folder.
+
+SKIPPED  S1: already in csv_merged — not reprocessed.
+SKIPPED  S2: already in csv_merged — not reprocessed.
+SKIPPED  S3: already in csv_merged — not reprocessed.
+SKIPPED  S4: already in csv_merged — not reprocessed.
+SKIPPED  S5: already in csv_merged — not reprocessed.
+SKIPPED  S6: already in csv_merged — not reprocessed.
+SKIPPED  S7: already in csv_merged — not reprocessed.
+SKIPPED  S8: already in csv_merged — not reprocessed.
+SKIPPED  S9: already in csv_merged — not reprocessed.
+SKIPPED  S10: already in csv_merged — not reprocessed.
+SKIPPED  S11: already in csv_merged — not reprocessed.
+SKIPPED  S12: already in csv_merged — not reprocessed.
+SKIPPED  S13: already in csv_merged — not reprocessed.
+SKIPPED  S14: already in csv_merged — not reprocessed.
+SKIPPED  S15: already in csv_merged — not reprocessed.
+SKIPPED  S16: already in csv_merged — not reprocessed.
+SKIPPED  S17: already in csv_merged — not reprocessed.
+WROTE    S18: Fusion_Coordinates_S18.csv → Fusion_Coordinates_S18.csv
+WROTE    S19: Fusion_Coordinates_S19.csv → Fusion_Coordinates_S19.csv
+WROTE    S20: Fusion_Coordinates_S20.csv → Fusion_Coordinates_S20.csv
+WROTE    S21: Fusion_Coordinates_S21.csv → Fusion_Coordinates_S21.csv
+
+============================================================
+SUMMARY
+============================================================
+  Shapes skipped (already merged) : 17
+  New shapes written              : 4
+  Duplicate rows removed (total)  : 0
+============================================================

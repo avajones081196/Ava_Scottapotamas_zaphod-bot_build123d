@@ -1,0 +1,36 @@
+============================================================
+AREA HISTORY  :  zaphod_bot_mec_de_man_out_printer_proto_clevis_3_area_history_G_1_29.txt
+Time          :  2026-05-30 17:30:37
+============================================================
+
+ Guideline     Cum. area (mm²)    Δ area (mm²)    Cum. vol (mm³)     Δ vol (mm³)  Label
+--------------------------------------------------------------------------------------------------------------
+  G1                    231.808        +231.808           266.573        +266.573  G1 pin solid on Y=30.0 (Y=20.5..30.5)
+  G2                   1486.440       +1254.631          3144.342       +2877.769  G2 block solid on Z=15.0 (Z=15.0..-7.0)
+  G4                   1103.946        -382.494          1107.773       -2036.569  G4 intersected fork body (X=10.0→-13.0 sweep ∩ block)
+  G5                   1091.928         -12.018          1123.224         +15.451  G5 filleted 2 slot edge(s) at r=2.0 mm
+  G6                   1081.261         -10.667          1120.945          -2.279  G6 chamfered 12 slot-mouth edge(s) at 0.25 mm (equal distance, mirror-symmetric)
+  G7                   1081.261          +0.000          1120.945          +0.000  G7 two circle profiles on Z=8.35: inner r=2.5046, outer r=3.5550
+  G8                   1081.261          +0.000          1120.945          +0.000  G8 circle profile on Z=8.797: r=4.2502
+  G9                   1081.261          +0.000          1120.945          +0.000  G9 guide-rail arc in Y=4.500 plane, Z=8.3500→8.7970
+  G10                  1084.943          +3.682          1141.170         +20.226  G10 loft unioned into fork (G7 outer → G8, guided=True): fork+loft volume 874.5976 mm³
+  G11                  1096.673         +11.730          1077.122         -64.049  G11 extrude-cut: inner r=2.5046, +3.25/-0.01 Z, Z=8.340..11.600
+  G12                  1095.340          -1.333          1076.984          -0.137  G12 fillet r=0.2 mm on S9 circle edge (Z=11.6, r=2.5046)
+  G13                  1094.337          -1.003          1076.907          -0.077  G13 fillet r=0.15 mm on S10 circle edge (Z=8.35, r=2.5046)
+  G14                  1093.982          -0.355          1076.874          -0.033  G14 fillet r=0.2 mm on S11 circle edge (Z=8.35, r=3.5550)
+  G15                  1093.982          +0.000          1076.874          +0.000  G15 two circle profiles on Z=3.25: inner r=2.5046, outer r=3.5550
+  G16                  1093.982          +0.000          1076.874          +0.000  G16 circle profile on Z=2.8029999999999995: r=4.2502
+  G17                  1093.982          +0.000          1076.874          +0.000  G17 guide-rail arc in Y=4.500 plane, Z=2.8030→3.2500
+  G18                  1097.664          +3.682          1097.100         +20.226  G18 boss (revolve G16→G15 outer): fork+boss volume 830.5267 mm³
+  G19                  1109.394         +11.730          1033.051         -64.049  G19 extrude-cut: inner r=2.5046, -5.5/+1.0 Z, Z=-2.250..4.250
+  G20                  1108.061          -1.333          1032.913          -0.137  G20 fillet r=0.2 mm on S15 circle edge (Z=0.0, r=2.5046)
+  G21                  1107.058          -1.003          1032.836          -0.077  G21 fillet r=0.15 mm on S16 circle edge (Z=3.25, r=2.5046)
+  G22                  1106.702          -0.355          1032.803          -0.033  G22 fillet r=0.2 mm on S17 circle edge (Z=3.25, r=3.5550)
+  G23                  1106.702          +0.000          1032.803          +0.000  G23 circle profile on Y=20.5: r=3.9999
+  G24                  1172.094         +65.392          1413.387        +380.584  G24 loft back-face→G23 circle; pin+fork+loft joined into 1 solid(s), vol 1413.3872 mm³
+  G25                  1163.896          -8.198          1406.358          -7.030  G25 fillet r=2.0 mm on 4 loft edge(s)
+  G26                  1143.831         -20.066          1398.144          -8.213  G26 chamfered 6 top/bottom edge(s) at 0.5 mm (equal distance, mirror-symmetric)
+  G27                  1278.145        +134.314          1302.438         -95.707  G27 extrude-cut bore r=1.4251, Y=30.5→15.5
+  G28                  1276.223          -1.922          1302.428          -0.009  G28 fillet r=0.25 mm on bore start/end rims
+  G29                  1276.223          +0.000             0.000       -1302.428  G29 unstitched solid into a 93-face surface model
+============================================================
